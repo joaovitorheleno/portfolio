@@ -1,4 +1,4 @@
-# Portfólio Pessoal - Caio Kfuri e João Heleno
+# Portfólio Pessoal - João Heleno
 
 Um portfólio desenvolvido para apresentar nossos projetos, experiências e trajetória na área de computação
 
