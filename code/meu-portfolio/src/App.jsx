@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Mail, Phone, CheckCircle, AlertCircle } from 'lucide-react';
+import { Sun, Moon, Mail, Phone, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+
+const EMAILJS_SERVICE_ID = 'service_zgefz9b';
+const EMAILJS_TEMPLATE_ID = 'template_icqnzzx';
+const EMAILJS_PUBLIC_KEY = 'xvMS_ZzKnMRxebX0I';
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('pt');
-  
+
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState('idle');
   const [formError, setFormError] = useState('');
@@ -24,15 +29,15 @@ export default function App() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.email || !formData.message) {
       setFormStatus('error');
       setFormError(content[language].formEmptyError);
       return;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setFormStatus('error');
@@ -40,12 +45,31 @@ export default function App() {
       return;
     }
 
-    setFormStatus('success');
-    setFormData({ name: '', email: '', message: '' });
-    
-    setTimeout(() => {
-      setFormStatus('idle');
-    }, 4000);
+    setFormStatus('sending');
+    setFormError('');
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          title: 'Mensagem do Portfólio',
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          to_email: 'joaoheleno971@gmail.com'
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+
+      setFormStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setFormStatus('idle'), 4000);
+    } catch (err) {
+      console.error('Erro ao enviar e-mail:', err);
+      setFormStatus('error');
+      setFormError(content[language].formSendError);
+    }
   };
 
   const content = {
@@ -71,25 +95,25 @@ export default function App() {
         title: 'Experiências',
         desc: 'Minha trajetória acadêmica e profissional atual.',
         items: [
-          { 
-            title: 'Desenvolvedor Backend Java (Sankhya)', 
-            date: 'Ago 2025 - Atual', 
-            desc: 'Atuação focada no ecossistema do ERP Sankhya, desenvolvendo event handlers em Java, triggers e procedures em PL/SQL, consultas complexas, layouts em JasperReports/iReport e fluxos automatizados de processos de negócios.' 
+          {
+            title: 'Desenvolvedor Backend Java (Sankhya)',
+            date: 'Ago 2025 - Atual',
+            desc: 'Atuação focada no ecossistema do ERP Sankhya, desenvolvendo event handlers em Java, triggers e procedures em PL/SQL, consultas complexas, layouts em JasperReports/iReport e fluxos automatizados de processos de negócios.'
           },
-          { 
-            title: 'Desenvolvedor FullStack Node.js e React (Betruck)', 
-            date: '2024 - Ago 2025', 
-            desc: 'Apoio ao desenvolvimento de aplicações web, participando da construção de interfaces de usuário e integrações de rotas e APIs no backend.' 
+          {
+            title: 'Desenvolvedor FullStack Node.js e React (Betruck)',
+            date: '2024 - Ago 2025',
+            desc: 'Apoio ao desenvolvimento de aplicações web, participando da construção de interfaces de usuário e integrações de rotas e APIs no backend.'
           },
-          { 
-            title: 'Fundador e Desenvolvedor da Solvantech', 
-            date: 'Dez 2025 - Atual', 
-            desc: 'Iniciativa voltada ao desenvolvimento de soluções de software para empresas, com foco em automação de processos e integração de sistemas.' 
+          {
+            title: 'Fundador e Desenvolvedor da Solvantech',
+            date: 'Dez 2025 - Atual',
+            desc: 'Iniciativa voltada ao desenvolvimento de soluções de software para empresas, com foco em automação de processos e integração de sistemas.'
           },
-          { 
-            title: 'Engenharia de Software - PUC Minas', 
-            date: 'Jan 2025 - Atual', 
-            desc: 'Estudante da Pontifícia Universidade Católica de Minas Gerais (PUC-Minas).' 
+          {
+            title: 'Engenharia de Software - PUC Minas',
+            date: 'Jan 2025 - Atual',
+            desc: 'Estudante da Pontifícia Universidade Católica de Minas Gerais (PUC-Minas).'
           }
         ]
       },
@@ -100,8 +124,10 @@ export default function App() {
         emailLabel: 'E-mail',
         msgLabel: 'Mensagem',
         btnSend: 'Enviar Mensagem',
+        btnSending: 'Enviando...',
         formEmptyError: 'Por favor, preencha todos os campos.',
         formEmailError: 'Por favor, insira um e-mail válido.',
+        formSendError: 'Não foi possível enviar. Tente novamente ou use o e-mail direto.',
         formSuccess: 'Mensagem enviada com sucesso!'
       }
     },
@@ -127,25 +153,25 @@ export default function App() {
         title: 'Experiences',
         desc: 'My academic and current professional background.',
         items: [
-          { 
-            title: 'Backend Java Developer (Sankhya)', 
-            date: 'Ago 2025 - Present', 
-            desc: "Focused work on the ERP Sankhya ecosystem, developing event handlers in Java, triggers and procedures in PL/SQL, complex queries, layouts in JasperReports/iReport, and automated business process flows." 
+          {
+            title: 'Backend Java Developer (Sankhya)',
+            date: 'Ago 2025 - Present',
+            desc: "Focused work on the ERP Sankhya ecosystem, developing event handlers in Java, triggers and procedures in PL/SQL, complex queries, layouts in JasperReports/iReport, and automated business process flows."
           },
-          { 
-            title: 'Node.js and React FullStack Developer (Betruck)', 
-            date: '2025 - Ago 2025', 
-            desc: 'Support for the development of web applications, participating in building user interfaces and integrating routes and APIs in the backend.' 
+          {
+            title: 'Node.js and React FullStack Developer (Betruck)',
+            date: '2024 - Ago 2025',
+            desc: 'Support for the development of web applications, participating in building user interfaces and integrating routes and APIs in the backend.'
           },
-          { 
-            title: 'Founder and Developer at Solvantech', 
-            date: '2025 - Ago 2025', 
-            desc: 'Initiative aimed at developing software solutions for companies, focusing on process automation and system integration.' 
+          {
+            title: 'Founder and Developer at Solvantech',
+            date: 'Dez 2025 - Present',
+            desc: 'Initiative aimed at developing software solutions for companies, focusing on process automation and system integration.'
           },
-          { 
-            title: 'Software Engineer - PUC Minas', 
-            date: 'Jan 2025 - Present', 
-            desc: 'Student at Pontifical Catholic University of Minas Gerais (PUC-Minas).' 
+          {
+            title: 'Software Engineer - PUC Minas',
+            date: 'Jan 2025 - Present',
+            desc: 'Student at Pontifical Catholic University of Minas Gerais (PUC-Minas).'
           }
         ]
       },
@@ -156,8 +182,10 @@ export default function App() {
         emailLabel: 'Email',
         msgLabel: 'Message',
         btnSend: 'Send Message',
+        btnSending: 'Sending...',
         formEmptyError: 'Please fill in all fields.',
         formEmailError: 'Please enter a valid email address.',
+        formSendError: 'Could not send. Please try again or use the direct email.',
         formSuccess: 'Message sent successfully!'
       }
     }
@@ -167,7 +195,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300">
-      
+
       <header className="flex justify-between items-center p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm dark:shadow-gray-950 fixed w-full top-0 z-10 transition-colors duration-300">
         <div className="text-xl font-bold">João Vitor Heleno Marinho</div>
         <nav className="hidden md:flex items-center space-x-6">
@@ -175,7 +203,7 @@ export default function App() {
           <a href="#projetos" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.projects}</a>
           <a href="#experiencias" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.exp}</a>
           <a href="#contato" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.contact}</a>
-          
+
           <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-700 pl-4">
             <button onClick={toggleLanguage} className="font-bold text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               {language === 'pt' ? 'EN' : 'PT'}
@@ -188,7 +216,7 @@ export default function App() {
       </header>
 
       <main className="pt-28 px-6 md:px-8 max-w-5xl mx-auto space-y-32">
-        
+
         <section id="sobre" className="text-center py-12 md:py-20 animate-fade-in-up">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">{t.hero.title}</h1>
           <h2 className="text-2xl text-blue-600 dark:text-blue-400 font-semibold mb-6">{t.hero.subtitle}</h2>
@@ -208,7 +236,7 @@ export default function App() {
         <section id="projetos">
           <h3 className="text-3xl font-bold mb-2">{t.projects.title}</h3>
           <p className="text-gray-500 dark:text-gray-400 mb-10">{t.projects.desc}</p>
-          
+
           <div className="relative border-l-2 border-blue-200 dark:border-blue-900 ml-3 md:ml-6 space-y-12">
             {t.projects.items.map((proj, index) => (
               <div key={index} className="relative pl-8 md:pl-10">
@@ -223,7 +251,7 @@ export default function App() {
         <section id="experiencias">
           <h3 className="text-3xl font-bold mb-2">{t.exp.title}</h3>
           <p className="text-gray-500 dark:text-gray-400 mb-10">{t.exp.desc}</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {t.exp.items.map((exp, index) => (
               <div key={index} className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
@@ -239,13 +267,13 @@ export default function App() {
 
         <section id="contato" className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 md:p-12 border border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            
+
             <div className="space-y-8">
               <div>
                 <h3 className="text-3xl font-bold mb-4">{t.contact.title}</h3>
                 <p className="text-gray-600 dark:text-gray-400 text-lg">{t.contact.desc}</p>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300">
                   <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-full text-blue-600 dark:text-blue-400"><Mail size={24} /></div>
@@ -265,21 +293,21 @@ export default function App() {
                 </div>
               </div>
             </div>
-            
+
             <form onSubmit={handleFormSubmit} className="space-y-5 bg-gray-50 dark:bg-gray-900/50 p-6 md:p-8 rounded-2xl">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.nameLabel}</label>
-                <input type="text" name="name" value={formData.name} onChange={handleFormChange} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+                <input type="text" name="name" value={formData.name} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.emailLabel}</label>
-                <input type="email" name="email" value={formData.email} onChange={handleFormChange} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+                <input type="email" name="email" value={formData.email} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.msgLabel}</label>
-                <textarea rows="4" name="message" value={formData.message} onChange={handleFormChange} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"></textarea>
+                <textarea rows="4" name="message" value={formData.message} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none disabled:opacity-60"></textarea>
               </div>
-              
+
               {formStatus === 'error' && (
                 <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-medium">
                   <AlertCircle size={16} /> {formError}
@@ -291,8 +319,9 @@ export default function App() {
                 </div>
               )}
 
-              <button type="submit" className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-md">
-                {t.contact.btnSend}
+              <button type="submit" disabled={formStatus === 'sending'} className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed">
+                {formStatus === 'sending' && <Loader2 size={18} className="animate-spin" />}
+                {formStatus === 'sending' ? t.contact.btnSending : t.contact.btnSend}
               </button>
             </form>
           </div>
