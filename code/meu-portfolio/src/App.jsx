@@ -129,6 +129,9 @@ export default function App() {
         formEmailError: 'Por favor, insira um e-mail válido.',
         formSendError: 'Não foi possível enviar. Tente novamente ou use o e-mail direto.',
         formSuccess: 'Mensagem enviada com sucesso!'
+      },
+      bottom: {
+        rights: 'Todos os direitos reservados.'
       }
     },
     en: {
@@ -187,6 +190,9 @@ export default function App() {
         formEmailError: 'Please enter a valid email address.',
         formSendError: 'Could not send. Please try again or use the direct email.',
         formSuccess: 'Message sent successfully!'
+      },
+      bottom: {
+        rights: 'All rights reserved.'
       }
     }
   };
@@ -330,7 +336,7 @@ export default function App() {
       </main>
 
       <footer className="text-center py-8 mt-20 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800">
-        <p className="font-medium">© 2026 João Vitor Heleno Marinho. Todos os direitos reservados.</p>
+        <p className="font-medium">© 2026 João Vitor Heleno Marinho. {t.bottom.rights}</p>
       </footer>
     </div>
   );

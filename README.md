@@ -2,10 +2,10 @@
 
 Um portfólio desenvolvido para apresentar nossos projetos, experiências e trajetória na área de computação
 
-# 🎨 Wireframe Inicial
-![Wireframe do Portfólio](/images/portfolio-wireframe.png)
+# Wireframe Inicial
+![Wireframe do Portfólio](./images/image.png)
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 Este projeto foi construído focando em performance e em um fluxo de desenvolvimento ágil:
 
