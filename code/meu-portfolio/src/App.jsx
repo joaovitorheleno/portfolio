@@ -74,13 +74,39 @@ export default function App() {
 
   const content = {
     pt: {
-      nav: { about: 'Sobre Mim', projects: 'Projetos', exp: 'Experiências', contact: 'Contato' },
+      nav: { about: 'Sobre Mim', stacks: 'Stacks', projects: 'Projetos', exp: 'Experiências', contact: 'Contato' },
       hero: {
         title: 'João Vitor Heleno Marinho',
-        subtitle: 'Engenheiro de Software & Estagiário de TI',
+        subtitle: 'Engenheiro de Software & Desenvolvedor Backend',
         desc: 'Estudante de Engenharia de Software na PUC Minas. Desenvolvo APIs robustas e sistemas escaláveis, aplicando boas práticas de arquitetura no dia a dia, hoje na Sankhya e como fundador da Solvantech.',
         btnProjects: '+ Ver Projetos',
         btnContact: 'Entrar em Contato'
+      },
+      stacks: {
+        title: 'Stacks',
+        desc: 'Tecnologias, linguagens e ferramentas que utilizo no dia a dia.',
+        groups: [
+          {
+            name: 'Linguagens',
+            items: ['Java', 'TypeScript', 'JavaScript', 'PL/SQL', 'SQL']
+          },
+          {
+            name: 'Backend & Frameworks',
+            items: ['Spring Boot', 'NestJS', 'Node.js', 'TypeORM', 'Electron', 'REST APIs']
+          },
+          {
+            name: 'Frontend & UI',
+            items: ['React', 'Tailwind CSS', 'Styled Components', 'Ant Design', 'Vite']
+          },
+          {
+            name: 'Bancos de Dados & ERP',
+            items: ['PostgreSQL', 'Oracle SQL', 'Sankhya ERP', 'JasperReports / iReport']
+          },
+          {
+            name: 'Ferramentas & DevOps',
+            items: ['Docker', 'Git & GitHub', 'Jira', 'PL/SQL Developer']
+          }
+        ]
       },
       projects: {
         title: 'Projetos',
@@ -135,13 +161,39 @@ export default function App() {
       }
     },
     en: {
-      nav: { about: 'About Me', projects: 'Projects', exp: 'Experiences', contact: 'Contact' },
+      nav: { about: 'About Me', stacks: 'Stacks', projects: 'Projects', exp: 'Experiences', contact: 'Contact' },
       hero: {
         title: 'João Vitor Heleno Marinho',
-        subtitle: 'Software Engineer & IT Intern',
+        subtitle: 'Software Engineer & Backend Developer',
         desc: 'Software Engineering student at PUC Minas. I develop robust APIs and scalable systems, applying good architecture practices daily, currently at Sankhya and as the founder of Solvantech.',
         btnProjects: '+ View Projects',
         btnContact: 'Get in Touch'
+      },
+      stacks: {
+        title: 'Stacks',
+        desc: 'Technologies, languages, and tools I use day to day.',
+        groups: [
+          {
+            name: 'Languages',
+            items: ['Java', 'TypeScript', 'JavaScript', 'PL/SQL', 'SQL']
+          },
+          {
+            name: 'Backend & Frameworks',
+            items: ['Spring Boot', 'NestJS', 'Node.js', 'TypeORM', 'Electron', 'REST APIs']
+          },
+          {
+            name: 'Frontend & UI',
+            items: ['React', 'Tailwind CSS', 'Styled Components', 'Ant Design', 'Vite']
+          },
+          {
+            name: 'Databases & ERP',
+            items: ['PostgreSQL', 'Oracle SQL', 'Sankhya ERP', 'JasperReports / iReport']
+          },
+          {
+            name: 'Tools & DevOps',
+            items: ['Docker', 'Git & GitHub', 'Jira', 'PL/SQL Developer']
+          }
+        ]
       },
       projects: {
         title: 'Projects',
@@ -206,6 +258,7 @@ export default function App() {
         <div className="text-xl font-bold">João Vitor Heleno Marinho</div>
         <nav className="hidden md:flex items-center space-x-6">
           <a href="#sobre" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.about}</a>
+          <a href="#stacks" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.stacks}</a>
           <a href="#projetos" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.projects}</a>
           <a href="#experiencias" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.exp}</a>
           <a href="#contato" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.contact}</a>
@@ -236,6 +289,26 @@ export default function App() {
             <a href="#contato" className="px-8 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-xl shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700">
               {t.hero.btnContact}
             </a>
+          </div>
+        </section>
+
+        <section id="stacks">
+          <h3 className="text-3xl font-bold mb-2">{t.stacks.title}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-10">{t.stacks.desc}</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {t.stacks.groups.map((group, index) => (
+              <div key={index} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h4 className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-4">{group.name}</h4>
+                <ul className="space-y-2">
+                  {group.items.map((tech, i) => (
+                    <li key={i} className="text-gray-700 dark:text-gray-300 text-sm font-medium">
+                      {tech}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
 
