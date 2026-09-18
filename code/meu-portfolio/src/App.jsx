@@ -78,7 +78,7 @@ export default function App() {
       hero: {
         title: 'João Vitor Heleno Marinho',
         subtitle: 'Engenheiro de Software & Estagiário de TI',
-        desc: 'Estudante de Engenharia de Software na PUC Minas. Desenvolvo APIs robustas e sistemas escaláveis, aplicando boas práticas de arquitetura no dia a dia — hoje na Sankhya e como fundador da Solvantech.',
+        desc: 'Estudante de Engenharia de Software na PUC Minas. Desenvolvo APIs robustas e sistemas escaláveis, aplicando boas práticas de arquitetura no dia a dia, hoje na Sankhya e como fundador da Solvantech.',
         btnProjects: '+ Ver Projetos',
         btnContact: 'Entrar em Contato'
       },
@@ -97,7 +97,7 @@ export default function App() {
         items: [
           {
             title: 'Desenvolvedor Backend Java (Sankhya)',
-            date: 'Ago 2025 - Atual',
+            date: 'Ago 2025 - Sep 2026',
             desc: 'Atuação focada no ecossistema do ERP Sankhya, desenvolvendo event handlers em Java, triggers e procedures em PL/SQL, consultas complexas, layouts em JasperReports/iReport e fluxos automatizados de processos de negócios.'
           },
           {
@@ -136,7 +136,7 @@ export default function App() {
       hero: {
         title: 'João Vitor Heleno Marinho',
         subtitle: 'Software Engineer & IT Intern',
-        desc: 'Software Engineering student at PUC Minas. I develop robust APIs and scalable systems, applying good architecture practices daily — currently at Sankhya and as the founder of Solvantech.',
+        desc: 'Software Engineering student at PUC Minas. I develop robust APIs and scalable systems, applying good architecture practices daily, currently at Sankhya and as the founder of Solvantech.',
         btnProjects: '+ View Projects',
         btnContact: 'Get in Touch'
       },
@@ -155,7 +155,7 @@ export default function App() {
         items: [
           {
             title: 'Backend Java Developer (Sankhya)',
-            date: 'Ago 2025 - Present',
+            date: 'Ago 2025 - Sep 2026',
             desc: "Focused work on the ERP Sankhya ecosystem, developing event handlers in Java, triggers and procedures in PL/SQL, complex queries, layouts in JasperReports/iReport, and automated business process flows."
           },
           {
@@ -297,15 +297,15 @@ export default function App() {
             <form onSubmit={handleFormSubmit} className="space-y-5 bg-gray-50 dark:bg-gray-900/50 p-6 md:p-8 rounded-2xl">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.nameLabel}</label>
-                <input type="text" name="name" value={formData.name} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
+                <input placeholder="Ex: Alex" type="text" name="name" value={formData.name} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.emailLabel}</label>
-                <input type="email" name="email" value={formData.email} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
+                <input placeholder="Ex: alex@gmail.com" type="email" name="email" value={formData.email} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.msgLabel}</label>
-                <textarea rows="4" name="message" value={formData.message} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none disabled:opacity-60"></textarea>
+                <textarea placeholder="Escreva sua mensagem aqui..." rows="4" name="message" value={formData.message} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none disabled:opacity-60"></textarea>
               </div>
 
               {formStatus === 'error' && (
