@@ -1,14 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Mail, Phone, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sun, Moon, Mail, Phone, CheckCircle, AlertCircle, Loader2, Lock, Menu, X } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
 const EMAILJS_SERVICE_ID = 'service_zgefz9b';
 const EMAILJS_TEMPLATE_ID = 'template_icqnzzx';
 const EMAILJS_PUBLIC_KEY = 'xvMS_ZzKnMRxebX0I';
 
+function readStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // armazenamento indisponível (ex.: aba anônima); preferência só vale na sessão
+  }
+}
+
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [language, setLanguage] = useState('pt');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = readStorage('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  const [language, setLanguage] = useState(() => readStorage('language') || 'pt');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState('idle');
@@ -20,7 +41,13 @@ export default function App() {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    writeStorage('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'pt' ? 'pt-BR' : 'en';
+    writeStorage('language', language);
+  }, [language]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
   const toggleLanguage = () => setLanguage(language === 'pt' ? 'en' : 'pt');
@@ -74,11 +101,11 @@ export default function App() {
 
   const content = {
     pt: {
-      nav: { about: 'Sobre Mim', stacks: 'Stacks', projects: 'Projetos', exp: 'Experiências', contact: 'Contato' },
+      nav: { about: 'Sobre Mim', stacks: 'Stacks', projects: 'Projetos', exp: 'Experiências', contact: 'Contato', menu: 'Abrir menu', theme: 'Alternar tema', language: 'Mudar idioma para inglês' },
       hero: {
         title: 'João Vitor Heleno Marinho',
         subtitle: 'Engenheiro de Software & Desenvolvedor Backend',
-        desc: 'Estudante de Engenharia de Software na PUC Minas. Desenvolvo APIs robustas e sistemas escaláveis, aplicando boas práticas de arquitetura no dia a dia, hoje na Sankhya e como fundador da Solvantech.',
+        desc: 'Estudante de Engenharia de Software na PUC Minas. Desenvolvo APIs robustas e sistemas escaláveis, aplicando boas práticas de arquitetura no dia a dia. Hoje à frente da Solvantech, entregando sistemas sob medida para empresas, com passagem pela Sankhya.',
         btnProjects: '+ Ver Projetos',
         btnContact: 'Entrar em Contato'
       },
@@ -110,11 +137,29 @@ export default function App() {
       },
       projects: {
         title: 'Projetos',
-        desc: 'Lista dos meus projetos.',
+        desc: 'Sistemas que desenvolvi, do projeto de estudo ao software em produção.',
+        featuredLabel: 'Projeto em destaque',
+        statusLabel: 'Em produção',
+        privateLabel: 'Código privado (cliente)',
+        imageAlt: 'Dashboard do sistema Versatti Contábil',
+        featured: {
+          name: 'Versatti Contábil',
+          tagline: 'Sistema de gestão documental para escritório de contabilidade',
+          desc: 'Desenvolvido sob demanda para a Versatti Contabilidade. Centraliza os documentos fiscais, societários e trabalhistas das empresas atendidas, controla vencimentos de alvarás, certidões e certificados e entrega os arquivos ao cliente por e-mail.',
+          highlights: [
+            'Dashboard de vencimentos e relatórios exportáveis em Excel e PDF',
+            'Upload de XML de NF-e com geração do DANFE (PDF) sob demanda',
+            'Perfis admin e cliente, com escopo de dados aplicado no backend',
+            'Cadastro de empresas com preenchimento automático pelo CNPJ (BrasilAPI)',
+            'Sessão com expiração por inatividade via Redis e auditoria com soft delete',
+            'Deploy com migrations em pre-deploy e health check (Railway + Vercel)'
+          ],
+          stack: ['NestJS', 'React', 'TypeScript', 'PostgreSQL', 'Redis', 'TypeORM', 'Ant Design', 'Docker']
+        },
         items: [
           { name: 'Servin', desc: 'Projeto de prática full-stack focado no desenvolvimento de um sistema de credenciamento, treinando a integração do backend com o frontend.' },
-          { name: 'Simulador de Drone', desc: 'Simulador desenvolvido principalmente com Typescript para simular uma entrega de drone.' },
-          { name: 'Sistema de Compra', desc: 'Sistema simples desenvolvido com Node.js e React para praticar boas práticas de programação na linguagem utilizada.' }
+          { name: 'Simulador de Drone', desc: 'Simulador desenvolvido principalmente com Typescript para simular uma entrega de drone.', stack: ['TypeScript'] },
+          { name: 'Sistema de Compra', desc: 'Sistema simples desenvolvido com Node.js e React para praticar boas práticas de programação na linguagem utilizada.', stack: ['Node.js', 'React'] }
         ]
       },
       exp: {
@@ -123,7 +168,7 @@ export default function App() {
         items: [
           {
             title: 'Desenvolvedor Backend Java (Sankhya)',
-            date: 'Ago 2025 - Sep 2026',
+            date: 'Ago 2025 - Set 2026',
             desc: 'Atuação focada no ecossistema do ERP Sankhya, desenvolvendo event handlers em Java, triggers e procedures em PL/SQL, consultas complexas, layouts em JasperReports/iReport e fluxos automatizados de processos de negócios.'
           },
           {
@@ -154,18 +199,21 @@ export default function App() {
         formEmptyError: 'Por favor, preencha todos os campos.',
         formEmailError: 'Por favor, insira um e-mail válido.',
         formSendError: 'Não foi possível enviar. Tente novamente ou use o e-mail direto.',
-        formSuccess: 'Mensagem enviada com sucesso!'
+        formSuccess: 'Mensagem enviada com sucesso!',
+        namePlaceholder: 'Ex: Alex',
+        emailPlaceholder: 'Ex: alex@gmail.com',
+        msgPlaceholder: 'Escreva sua mensagem aqui...'
       },
       bottom: {
         rights: 'Todos os direitos reservados.'
       }
     },
     en: {
-      nav: { about: 'About Me', stacks: 'Stacks', projects: 'Projects', exp: 'Experiences', contact: 'Contact' },
+      nav: { about: 'About Me', stacks: 'Stacks', projects: 'Projects', exp: 'Experiences', contact: 'Contact', menu: 'Open menu', theme: 'Toggle theme', language: 'Switch language to Portuguese' },
       hero: {
         title: 'João Vitor Heleno Marinho',
         subtitle: 'Software Engineer & Backend Developer',
-        desc: 'Software Engineering student at PUC Minas. I develop robust APIs and scalable systems, applying good architecture practices daily, currently at Sankhya and as the founder of Solvantech.',
+        desc: 'Software Engineering student at PUC Minas. I develop robust APIs and scalable systems, applying good architecture practices daily. Currently leading Solvantech, delivering custom systems for companies, with previous experience at Sankhya.',
         btnProjects: '+ View Projects',
         btnContact: 'Get in Touch'
       },
@@ -197,11 +245,29 @@ export default function App() {
       },
       projects: {
         title: 'Projects',
-        desc: 'List of my recently projects.',
+        desc: 'Systems I have built, from study projects to software in production.',
+        featuredLabel: 'Featured project',
+        statusLabel: 'In production',
+        privateLabel: 'Private code (client)',
+        imageAlt: 'Versatti Contábil system dashboard',
+        featured: {
+          name: 'Versatti Contábil',
+          tagline: 'Document management system for an accounting firm',
+          desc: 'Built on demand for Versatti Contabilidade. It centralizes the tax, corporate and labor documents of the firm\'s client companies, tracks expiration dates of permits, certificates and clearances, and delivers files to clients by email.',
+          highlights: [
+            'Expiration dashboard and reports exportable to Excel and PDF',
+            'NF-e XML upload with on-demand DANFE (PDF) generation',
+            'Admin and client roles, with data scoping enforced in the backend',
+            'Company registration auto-filled from the CNPJ (BrasilAPI)',
+            'Inactivity-based session expiry with Redis, plus soft-delete auditing',
+            'Deploys with pre-deploy migrations and health checks (Railway + Vercel)'
+          ],
+          stack: ['NestJS', 'React', 'TypeScript', 'PostgreSQL', 'Redis', 'TypeORM', 'Ant Design', 'Docker']
+        },
         items: [
           { name: 'Servin', desc: 'Full-stack practice project focused on developing an accreditation system, training the integration of the backend with the frontend.' },
-          { name: 'Drone Simulator', desc: 'Simulator mainly developed with Typescript to simulate a drone delivery.' },
-          { name: 'Order System', desc: 'Simple system developed with Node.js and React to practice good programming practices in the language used.' }
+          { name: 'Drone Simulator', desc: 'Simulator mainly developed with TypeScript to simulate a drone delivery.', stack: ['TypeScript'] },
+          { name: 'Order System', desc: 'Simple system developed with Node.js and React to practice good programming practices in the language used.', stack: ['Node.js', 'React'] }
         ]
       },
       exp: {
@@ -210,21 +276,21 @@ export default function App() {
         items: [
           {
             title: 'Backend Java Developer (Sankhya)',
-            date: 'Ago 2025 - Sep 2026',
+            date: 'Aug 2025 - Sep 2026',
             desc: "Focused work on the ERP Sankhya ecosystem, developing event handlers in Java, triggers and procedures in PL/SQL, complex queries, layouts in JasperReports/iReport, and automated business process flows."
           },
           {
             title: 'Node.js and React FullStack Developer (Betruck)',
-            date: '2024 - Ago 2025',
+            date: '2024 - Aug 2025',
             desc: 'Support for the development of web applications, participating in building user interfaces and integrating routes and APIs in the backend.'
           },
           {
             title: 'Founder and Developer at Solvantech',
-            date: 'Dez 2025 - Present',
+            date: 'Dec 2025 - Present',
             desc: 'Initiative aimed at developing software solutions for companies, focusing on process automation and system integration.'
           },
           {
-            title: 'Software Engineer - PUC Minas',
+            title: 'Software Engineering - PUC Minas',
             date: 'Jan 2025 - Present',
             desc: 'Student at Pontifical Catholic University of Minas Gerais (PUC-Minas).'
           }
@@ -241,7 +307,10 @@ export default function App() {
         formEmptyError: 'Please fill in all fields.',
         formEmailError: 'Please enter a valid email address.',
         formSendError: 'Could not send. Please try again or use the direct email.',
-        formSuccess: 'Message sent successfully!'
+        formSuccess: 'Message sent successfully!',
+        namePlaceholder: 'e.g. Alex',
+        emailPlaceholder: 'e.g. alex@gmail.com',
+        msgPlaceholder: 'Write your message here...'
       },
       bottom: {
         rights: 'All rights reserved.'
@@ -250,31 +319,55 @@ export default function App() {
   };
 
   const t = content[language];
+  const navLinks = [
+    { href: '#sobre', label: t.nav.about },
+    { href: '#stacks', label: t.nav.stacks },
+    { href: '#projetos', label: t.nav.projects },
+    { href: '#experiencias', label: t.nav.exp },
+    { href: '#contato', label: t.nav.contact }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300">
 
-      <header className="flex justify-between items-center p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm dark:shadow-gray-950 fixed w-full top-0 z-10 transition-colors duration-300">
-        <div className="text-xl font-bold">João Vitor Heleno Marinho</div>
-        <nav className="hidden md:flex items-center space-x-6">
-          <a href="#sobre" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.about}</a>
-          <a href="#stacks" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.stacks}</a>
-          <a href="#projetos" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.projects}</a>
-          <a href="#experiencias" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.exp}</a>
-          <a href="#contato" className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{t.nav.contact}</a>
+      <header className="fixed w-full top-0 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm dark:shadow-gray-950 transition-colors duration-300">
+        <div className="flex justify-between items-center p-6">
+          <a href="#sobre" className="text-lg md:text-xl font-bold truncate">
+            <span className="sm:hidden">João Heleno</span>
+            <span className="hidden sm:inline">João Vitor Heleno Marinho</span>
+          </a>
 
-          <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-700 pl-4">
-            <button onClick={toggleLanguage} className="font-bold text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              {language === 'pt' ? 'EN' : 'PT'}
-            </button>
-            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
-              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+          <div className="flex items-center gap-6">
+            <nav className="hidden md:flex items-center space-x-6">
+              {navLinks.map((link) => (
+                <a key={link.href} href={link.href} className="hover:text-blue-600 dark:hover:text-blue-400 font-medium">{link.label}</a>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2 md:border-l border-gray-300 dark:border-gray-700 md:pl-4">
+              <button onClick={toggleLanguage} aria-label={t.nav.language} className="font-bold text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {language === 'pt' ? 'EN' : 'PT'}
+              </button>
+              <button onClick={toggleTheme} aria-label={t.nav.theme} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label={t.nav.menu} aria-expanded={isMenuOpen} className="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
           </div>
-        </nav>
+        </div>
+
+        {isMenuOpen && (
+          <nav className="md:hidden flex flex-col px-6 pb-4 border-t border-gray-200 dark:border-gray-700">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)} className="py-3 font-medium hover:text-blue-600 dark:hover:text-blue-400">{link.label}</a>
+            ))}
+          </nav>
+        )}
       </header>
 
-      <main className="pt-28 px-6 md:px-8 max-w-5xl mx-auto space-y-32">
+      <main className="pt-28 px-6 md:px-8 max-w-5xl mx-auto space-y-32 [&>section]:scroll-mt-28">
 
         <section id="sobre" className="text-center py-12 md:py-20 animate-fade-in-up">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">{t.hero.title}</h1>
@@ -316,12 +409,56 @@ export default function App() {
           <h3 className="text-3xl font-bold mb-2">{t.projects.title}</h3>
           <p className="text-gray-500 dark:text-gray-400 mb-10">{t.projects.desc}</p>
 
+          <article className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-12">
+            <a href="/projects/versatti-dashboard.png" target="_blank" rel="noreferrer" className="block bg-gray-100 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
+              <img src="/projects/versatti-dashboard.png" alt={t.projects.imageAlt} loading="lazy" className="w-full h-auto object-cover object-top max-h-96 hover:opacity-90 transition-opacity" />
+            </a>
+            <div className="p-6 md:p-10">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-xs font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400">{t.projects.featuredLabel}</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                  {t.projects.statusLabel}
+                </span>
+              </div>
+              <h4 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">{t.projects.featured.name}</h4>
+              <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">{t.projects.featured.tagline}</p>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">{t.projects.featured.desc}</p>
+
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mb-6">
+                {t.projects.featured.highlights.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <CheckCircle size={16} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {t.projects.featured.stack.map((tech) => (
+                  <span key={tech} className="px-3 py-1 bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full">{tech}</span>
+                ))}
+              </div>
+
+              <span className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <Lock size={14} /> {t.projects.privateLabel}
+              </span>
+            </div>
+          </article>
+
           <div className="relative border-l-2 border-blue-200 dark:border-blue-900 ml-3 md:ml-6 space-y-12">
             {t.projects.items.map((proj, index) => (
               <div key={index} className="relative pl-8 md:pl-10">
                 <div className="absolute w-4 h-4 bg-blue-600 dark:bg-blue-500 rounded-full -left-[9px] top-1.5 shadow-sm"></div>
                 <h4 className="text-xl font-bold text-gray-900 dark:text-white mt-1 mb-2">{proj.name}</h4>
                 <p className="text-gray-600 dark:text-gray-400">{proj.desc}</p>
+                {proj.stack && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {proj.stack.map((tech) => (
+                      <span key={tech} className="px-2.5 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-semibold rounded-full">{tech}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -356,17 +493,17 @@ export default function App() {
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300">
                   <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-full text-blue-600 dark:text-blue-400"><Mail size={24} /></div>
-                  <span className="font-medium">joaoheleno971@gmail.com</span>
+                  <a href="mailto:joaoheleno971@gmail.com" className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">joaoheleno971@gmail.com</a>
                 </div>
                 <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300">
                   <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-full text-blue-600 dark:text-blue-400"><Phone size={24} /></div>
-                  <span className="font-medium">+55 (31) 9 9279-3141</span>
+                  <a href="tel:+5531992793141" className="font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">+55 (31) 9 9279-3141</a>
                 </div>
                 <div className="flex gap-4 pt-4">
-                  <a href="https://github.com/joaovitorheleno" target="_blank" rel="noreferrer" className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300">
+                  <a href="https://github.com/joaovitorheleno" target="_blank" rel="noreferrer" aria-label="GitHub" className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path></svg>
                   </a>
-                  <a href="https://www.linkedin.com/in/joaovitorhelenomarinho/" target="_blank" rel="noreferrer" className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300">
+                  <a href="https://www.linkedin.com/in/joaovitorhelenomarinho/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                   </a>
                 </div>
@@ -375,16 +512,16 @@ export default function App() {
 
             <form onSubmit={handleFormSubmit} className="space-y-5 bg-gray-50 dark:bg-gray-900/50 p-6 md:p-8 rounded-2xl">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.nameLabel}</label>
-                <input placeholder="Ex: Alex" type="text" name="name" value={formData.name} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
+                <label htmlFor="contact-name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.nameLabel}</label>
+                <input id="contact-name" placeholder={t.contact.namePlaceholder} type="text" name="name" value={formData.name} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.emailLabel}</label>
-                <input placeholder="Ex: alex@gmail.com" type="email" name="email" value={formData.email} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
+                <label htmlFor="contact-email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.emailLabel}</label>
+                <input id="contact-email" placeholder={t.contact.emailPlaceholder} type="email" name="email" value={formData.email} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-60" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.msgLabel}</label>
-                <textarea placeholder="Escreva sua mensagem aqui..." rows="4" name="message" value={formData.message} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none disabled:opacity-60"></textarea>
+                <label htmlFor="contact-message" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t.contact.msgLabel}</label>
+                <textarea id="contact-message" placeholder={t.contact.msgPlaceholder} rows="4" name="message" value={formData.message} onChange={handleFormChange} disabled={formStatus === 'sending'} className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none disabled:opacity-60"></textarea>
               </div>
 
               {formStatus === 'error' && (
